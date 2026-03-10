@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest --testEnvironment=node --forceExit --detectOpenHandles"
+    "test": "NODE_ENV=test jest --testEnvironment=node --forceExit --detectOpenHandles"
   },
   "repository": {
     "type": "git",
@@ -45,7 +45,9 @@
     "moduleNameMapper": {
       "^.+/models/User$": "<rootDir>/tests/__mocks__/User.js",
       "^.+/models/Product$": "<rootDir>/tests/__mocks__/Product.js",
-      "^.+/models/Order$": "<rootDir>/tests/__mocks__/Order.js"
+      "^.+/models/Order$": "<rootDir>/tests/__mocks__/Order.js",
+      "^.+/models/Service$": "<rootDir>/tests/__mocks__/Service.js",
+      "^.+/models/ServiceRequest$": "<rootDir>/tests/__mocks__/ServiceRequest.js"
     }
   }
 }

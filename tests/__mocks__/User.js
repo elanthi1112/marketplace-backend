@@ -8,7 +8,10 @@ class UserDoc {
     this.name = data.name;
     this.email = (data.email || '').toLowerCase().trim();
     this.password = data.password;
-    this.role = data.role || 'buyer';
+    this.role = data.role || 'user';
+    this.phone = data.phone || '';
+    this.avatar = data.avatar || '';
+    this.isActive = data.isActive !== undefined ? data.isActive : true;
     this.createdAt = data.createdAt || new Date();
     this.updatedAt = data.updatedAt || new Date();
   }
@@ -30,6 +33,9 @@ class UserDoc {
       email: this.email,
       password: this.password,
       role: this.role,
+      phone: this.phone,
+      avatar: this.avatar,
+      isActive: this.isActive,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
