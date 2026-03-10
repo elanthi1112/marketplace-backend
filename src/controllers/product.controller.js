@@ -3,7 +3,11 @@ const Product = require('../models/Product');
 
 const getProducts = async (req, res, next) => {
   try {
-    const { category, search, page = 1, limit = 20 } = req.query;
+    const rawPage = Number(req.query.page);
+    const rawLimit = Number(req.query.limit);
+    const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+    const limit = Number.isInteger(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 20;
+    const { category, search } = req.query;
     const filter = {};
     if (category) filter.category = category;
     if (search) filter.$text = { $search: search };

@@ -68,11 +68,21 @@ const createOrder = async (req, res, next) => {
       )
     );
 
-    const order = await Order.create({
-      buyer: req.user._id,
-      items: orderItems,
-      totalAmount,
-    });
+    let order;
+    try {
+      order = await Order.create({
+        buyer: req.user._id,
+        items: orderItems,
+        totalAmount,
+      });
+    } catch (createErr) {
+      await Promise.all(
+        items.map(item =>
+          Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+        )
+      );
+      throw createErr;
+    }
     await order.populate([
       { path: 'buyer', select: 'name email' },
       { path: 'items.product', select: 'title price' },
