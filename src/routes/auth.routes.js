@@ -8,7 +8,7 @@ router.post(
     body('name').notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('role').optional().isIn(['buyer', 'seller']).withMessage('Role must be buyer or seller'),
+    body('role').optional().isIn(['user', 'professional']).withMessage('Role must be user or professional'),
   ],
   register
 );
