@@ -1,7 +1,9 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const { protect } = require('../middleware/auth.middleware');
-const { getMe, updateMe, switchRole } = require('../controllers/user.controller');
+import { Router } from 'express';
+import { body } from 'express-validator';
+import { protect } from '../middleware/auth.middleware';
+import { getMe, updateMe, switchRole } from '../controllers/user.controller';
+
+const router = Router();
 
 router.use(protect);
 
@@ -24,4 +26,4 @@ router.put(
   switchRole
 );
 
-module.exports = router;
+export default router;

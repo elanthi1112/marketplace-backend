@@ -1,6 +1,19 @@
-const mongoose = require('mongoose');
+import mongoose, { Model, Document } from 'mongoose';
 
-const serviceSchema = new mongoose.Schema(
+interface IService extends Document {
+  title: string;
+  description: string;
+  price: number;
+  priceType?: string;
+  minimumCharge?: number;
+  travelFee?: number;
+  category: string;
+  professional: mongoose.Types.ObjectId;
+  isActive?: boolean;
+  imageUrl?: string;
+}
+
+const serviceSchema = new mongoose.Schema<IService>(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true },
@@ -20,4 +33,5 @@ serviceSchema.index({ title: 'text', description: 'text' });
 serviceSchema.index({ category: 1 });
 serviceSchema.index({ professional: 1 });
 
-module.exports = mongoose.model('Service', serviceSchema);
+const Service: Model<IService> = mongoose.model<IService>('Service', serviceSchema);
+export default Service;

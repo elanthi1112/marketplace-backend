@@ -1,9 +1,11 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const { protect } = require('../middleware/auth.middleware');
-const {
+import { Router } from 'express';
+import { body } from 'express-validator';
+import { protect } from '../middleware/auth.middleware';
+import {
   getCompanies, getCompany, createCompany, updateCompany, addProfessional, removeProfessional,
-} = require('../controllers/company.controller');
+} from '../controllers/company.controller';
+
+const router = Router();
 
 // Public routes
 router.get('/', getCompanies);
@@ -33,4 +35,4 @@ router.put(
 router.post('/:id/professionals', protect, addProfessional);
 router.delete('/:id/professionals/:profId', protect, removeProfessional);
 
-module.exports = router;
+export default router;

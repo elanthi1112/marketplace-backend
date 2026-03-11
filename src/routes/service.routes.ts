@@ -1,9 +1,11 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const { protect, requireRole } = require('../middleware/auth.middleware');
-const {
+import { Router } from 'express';
+import { body } from 'express-validator';
+import { protect, requireRole } from '../middleware/auth.middleware';
+import {
   getServices, getService, createService, updateService, deleteService,
-} = require('../controllers/service.controller');
+} from '../controllers/service.controller';
+
+const router = Router();
 
 router.get('/', getServices);
 router.get('/:id', getService);
@@ -36,4 +38,4 @@ router.put(
 
 router.delete('/:id', protect, requireRole('professional'), deleteService);
 
-module.exports = router;
+export default router;

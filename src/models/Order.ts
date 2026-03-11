@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose, { Model, Document } from 'mongoose';
 
 const orderItemSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -6,10 +6,17 @@ const orderItemSchema = new mongoose.Schema({
   price: { type: Number, required: true, min: 0 },
 });
 
-const orderSchema = new mongoose.Schema(
+interface IOrder extends Document {
+  buyer: mongoose.Types.ObjectId;
+  items: Array<{ product: mongoose.Types.ObjectId; quantity: number; price: number }>;
+  totalAmount: number;
+  status?: string;
+}
+
+const orderSchema = new mongoose.Schema<IOrder>(
   {
     buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    items: { type: [orderItemSchema], required: true, validate: v => v.length > 0 },
+    items: { type: [orderItemSchema], required: true, validate: (v: any) => v.length > 0 },
     totalAmount: { type: Number, required: true, min: 0 },
     status: {
       type: String,
@@ -23,4 +30,5 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ buyer: 1 });
 orderSchema.index({ status: 1 });
 
-module.exports = mongoose.model('Order', orderSchema);
+const Order: Model<IOrder> = mongoose.model<IOrder>('Order', orderSchema);
+export default Order;

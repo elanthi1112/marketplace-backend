@@ -1,7 +1,9 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const { protect } = require('../middleware/auth.middleware');
-const { getBookings, getBooking, createBooking, updateBookingStatus, counterBooking } = require('../controllers/booking.controller');
+import { Router } from 'express';
+import { body } from 'express-validator';
+import { protect } from '../middleware/auth.middleware';
+import { getBookings, getBooking, createBooking, updateBookingStatus, counterBooking } from '../controllers/booking.controller';
+
+const router = Router();
 
 router.use(protect);
 
@@ -35,4 +37,4 @@ router.put(
   counterBooking
 );
 
-module.exports = router;
+export default router;

@@ -1,15 +1,16 @@
-const { validationResult } = require('express-validator');
-const ProfessionalProfile = require('../models/ProfessionalProfile');
-const User = require('../models/User');
+import { validationResult } from 'express-validator';
+import ProfessionalProfile from '../models/ProfessionalProfile';
+import User from '../models/User';
+import { Request, Response, NextFunction } from 'express';
 
-const getProfessionals = async (req, res, next) => {
+export const getProfessionals = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { profession, lat, lng, radius, page: rawPage, limit: rawLimit } = req.query;
+    const { profession, lat, lng, radius, page: rawPage, limit: rawLimit } = req.query as any;
     const page = Math.max(1, parseInt(rawPage) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(rawLimit) || 20));
     const skip = (page - 1) * limit;
 
-    const filter = { isVisibleOnMap: true };
+    const filter: any = { isVisibleOnMap: true };
     if (profession) filter.$text = { $search: profession };
 
     let query = ProfessionalProfile.find(filter);
@@ -40,33 +41,40 @@ const getProfessionals = async (req, res, next) => {
   }
 };
 
-const getProfessional = async (req, res, next) => {
+export const getProfessional = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const profile = await ProfessionalProfile.findOne({ user: req.params.userId })
       .populate('user', 'name email avatar phone company');
-    if (!profile) return res.status(404).json({ message: 'Professional profile not found' });
+    if (!profile) {
+      res.status(404).json({ message: 'Professional profile not found' });
+      return;
+    }
     res.json(profile);
   } catch (err) {
     next(err);
   }
 };
 
-const getMyProfile = async (req, res, next) => {
+export const getMyProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const profile = await ProfessionalProfile.findOne({ user: req.user._id })
+    const profile = await ProfessionalProfile.findOne({ user: (req as any).user._id })
       .populate('user', 'name email avatar phone company');
-    if (!profile) return res.status(404).json({ message: 'Professional profile not found' });
+    if (!profile) {
+      res.status(404).json({ message: 'Professional profile not found' });
+      return;
+    }
     res.json(profile);
   } catch (err) {
     next(err);
   }
 };
 
-const upsertProfile = async (req, res, next) => {
+export const upsertProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+      res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+      return;
     }
 
     const allowed = [
@@ -74,7 +82,7 @@ const upsertProfile = async (req, res, next) => {
       'serviceRadiusKm', 'serviceAreas', 'availability',
       'showPhone', 'showAvailabilityPublicly', 'isVisibleOnMap',
     ];
-    const updates = {};
+    const updates: any = {};
     allowed.forEach(field => {
       if (req.body[field] !== undefined) updates[field] = req.body[field];
     });
@@ -89,7 +97,7 @@ const upsertProfile = async (req, res, next) => {
     updates.profileCompleteness = computeCompleteness({ ...updates });
 
     const profile = await ProfessionalProfile.findOneAndUpdate(
-      { user: req.user._id },
+      { user: (req as any).user._id },
       { $set: updates },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     ).populate('user', 'name email avatar');
@@ -100,26 +108,30 @@ const upsertProfile = async (req, res, next) => {
   }
 };
 
-const submitVerification = async (req, res, next) => {
+export const submitVerification = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { documents } = req.body;
     if (!documents || !Array.isArray(documents) || documents.length === 0) {
-      return res.status(400).json({ message: 'At least one verification document is required' });
+      res.status(400).json({ message: 'At least one verification document is required' });
+      return;
     }
 
     const profile = await ProfessionalProfile.findOneAndUpdate(
-      { user: req.user._id },
+      { user: (req as any).user._id },
       { verificationStatus: 'pending', verificationDocuments: documents },
       { new: true }
     );
-    if (!profile) return res.status(404).json({ message: 'Professional profile not found' });
+    if (!profile) {
+      res.status(404).json({ message: 'Professional profile not found' });
+      return;
+    }
     res.json({ message: 'Verification submitted', verificationStatus: profile.verificationStatus });
   } catch (err) {
     next(err);
   }
 };
 
-function computeCompleteness(profile) {
+function computeCompleteness(profile: any): number {
   const fields = ['profession', 'bio', 'yearsOfExperience', 'languages', 'certifications', 'serviceAreas', 'availability'];
   let filled = 0;
   fields.forEach(f => {
@@ -128,5 +140,3 @@ function computeCompleteness(profile) {
   });
   return Math.round((filled / fields.length) * 100);
 }
-
-module.exports = { getProfessionals, getProfessional, getMyProfile, upsertProfile, submitVerification };

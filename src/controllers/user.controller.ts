@@ -1,28 +1,30 @@
-const { validationResult } = require('express-validator');
-const User = require('../models/User');
+import { validationResult } from 'express-validator';
+import User from '../models/User';
+import { Request, Response, NextFunction } from 'express';
 
-const getMe = async (req, res, next) => {
+export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    res.json(req.user);
+    res.json((req as any).user);
   } catch (err) {
     next(err);
   }
 };
 
-const updateMe = async (req, res, next) => {
+export const updateMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+      res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+      return;
     }
     const { name, email, phone, avatar } = req.body;
-    const updates = {};
+    const updates: any = {};
     if (name !== undefined) updates.name = name;
     if (email !== undefined) updates.email = email;
     if (phone !== undefined) updates.phone = phone;
     if (avatar !== undefined) updates.avatar = avatar;
 
-    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+    const user = await User.findByIdAndUpdate((req as any).user._id, updates, {
       new: true,
       runValidators: true,
     });
@@ -32,14 +34,15 @@ const updateMe = async (req, res, next) => {
   }
 };
 
-const switchRole = async (req, res, next) => {
+export const switchRole = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { role } = req.body;
     if (!['user', 'professional'].includes(role)) {
-      return res.status(400).json({ message: 'Role must be user or professional' });
+      res.status(400).json({ message: 'Role must be user or professional' });
+      return;
     }
     const user = await User.findByIdAndUpdate(
-      req.user._id,
+      (req as any).user._id,
       { role },
       { new: true, runValidators: true }
     );
@@ -48,5 +51,3 @@ const switchRole = async (req, res, next) => {
     next(err);
   }
 };
-
-module.exports = { getMe, updateMe, switchRole };

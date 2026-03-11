@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose, { Model, Document } from 'mongoose';
 
 const counterOfferSchema = new mongoose.Schema({
   price: { type: Number, min: 0 },
@@ -6,7 +6,20 @@ const counterOfferSchema = new mongoose.Schema({
   notes: { type: String, default: '' },
 }, { _id: false });
 
-const serviceRequestSchema = new mongoose.Schema(
+interface IServiceRequest extends Document {
+  client: mongoose.Types.ObjectId;
+  professional: mongoose.Types.ObjectId;
+  service?: mongoose.Types.ObjectId;
+  serviceTitle: string;
+  preferredDateTime?: Date;
+  notes?: string;
+  offeredPrice?: number;
+  counterOffer?: any;
+  cancelReason?: string;
+  status?: string;
+}
+
+const serviceRequestSchema = new mongoose.Schema<IServiceRequest>(
   {
     client: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     professional: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -30,4 +43,5 @@ serviceRequestSchema.index({ client: 1 });
 serviceRequestSchema.index({ professional: 1 });
 serviceRequestSchema.index({ status: 1 });
 
-module.exports = mongoose.model('ServiceRequest', serviceRequestSchema);
+const ServiceRequest: Model<IServiceRequest> = mongoose.model<IServiceRequest>('ServiceRequest', serviceRequestSchema);
+export default ServiceRequest;

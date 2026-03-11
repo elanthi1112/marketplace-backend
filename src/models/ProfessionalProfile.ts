@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose, { Model, Document } from 'mongoose';
 
 const timeSlotSchema = new mongoose.Schema({
-  start: { type: String, required: true },  // e.g. "09:00"
-  end: { type: String, required: true },    // e.g. "17:00"
+  start: { type: String, required: true },
+  end: { type: String, required: true },
 }, { _id: false });
 
 const availabilitySchema = new mongoose.Schema({
@@ -16,7 +16,31 @@ const availabilitySchema = new mongoose.Schema({
   acceptUrgentRequests: { type: Boolean, default: false },
 }, { _id: false });
 
-const professionalProfileSchema = new mongoose.Schema(
+interface IProfessionalProfile extends Document {
+  user: mongoose.Types.ObjectId;
+  profession: string;
+  bio?: string;
+  yearsOfExperience?: number;
+  languages?: string[];
+  certifications?: string[];
+  location?: {
+    type: string;
+    coordinates: number[];
+  };
+  serviceRadiusKm?: number;
+  serviceAreas?: string[];
+  availability?: any;
+  showPhone?: boolean;
+  showAvailabilityPublicly?: boolean;
+  isVisibleOnMap?: boolean;
+  verificationStatus?: string;
+  verificationDocuments?: string[];
+  verificationRejectionReason?: string;
+  profileCompleteness?: number;
+  requiresVerification?: boolean;
+}
+
+const professionalProfileSchema = new mongoose.Schema<IProfessionalProfile>(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
     profession: { type: String, required: true, trim: true },
@@ -26,7 +50,7 @@ const professionalProfileSchema = new mongoose.Schema(
     certifications: [{ type: String, trim: true }],
     location: {
       type: { type: String, enum: ['Point'], default: 'Point' },
-      coordinates: { type: [Number], default: [0, 0] }, // [longitude, latitude]
+      coordinates: { type: [Number], default: [0, 0] },
     },
     serviceRadiusKm: { type: Number, min: 0, default: 10 },
     serviceAreas: [{ type: String, trim: true }],
@@ -51,4 +75,5 @@ professionalProfileSchema.index({ location: '2dsphere' });
 professionalProfileSchema.index({ user: 1 });
 professionalProfileSchema.index({ profession: 'text' });
 
-module.exports = mongoose.model('ProfessionalProfile', professionalProfileSchema);
+const ProfessionalProfile: Model<IProfessionalProfile> = mongoose.model<IProfessionalProfile>('ProfessionalProfile', professionalProfileSchema);
+export default ProfessionalProfile;

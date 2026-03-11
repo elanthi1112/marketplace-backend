@@ -1,7 +1,19 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose, { Document, Model } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema(
+interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  phone?: string;
+  avatar?: string;
+  company?: mongoose.Types.ObjectId;
+  isActive?: boolean;
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
+
+const userSchema = new mongoose.Schema<IUser>(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
@@ -15,13 +27,12 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre<IUser>('save', async function (this: IUser) {
+  if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 12);
-  next();
 });
 
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
@@ -31,4 +42,5 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
-module.exports = mongoose.model('User', userSchema);
+const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
+export default User;

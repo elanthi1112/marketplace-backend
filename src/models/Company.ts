@@ -1,6 +1,20 @@
-const mongoose = require('mongoose');
+import mongoose, { Model, Document } from 'mongoose';
 
-const companySchema = new mongoose.Schema(
+interface ICompany extends Document {
+  name: string;
+  description?: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  logo?: string;
+  owner: mongoose.Types.ObjectId;
+  professionals?: mongoose.Types.ObjectId[];
+  verificationStatus?: string;
+  isActive?: boolean;
+}
+
+const companySchema = new mongoose.Schema<ICompany>(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
@@ -24,4 +38,5 @@ const companySchema = new mongoose.Schema(
 companySchema.index({ owner: 1 });
 companySchema.index({ name: 'text' });
 
-module.exports = mongoose.model('Company', companySchema);
+const Company: Model<ICompany> = mongoose.model<ICompany>('Company', companySchema);
+export default Company;

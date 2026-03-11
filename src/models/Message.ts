@@ -1,6 +1,14 @@
-const mongoose = require('mongoose');
+import mongoose, { Model, Document } from 'mongoose';
 
-const messageSchema = new mongoose.Schema(
+interface IMessage extends Document {
+  conversation: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
+  content: string;
+  type?: string;
+  isRead?: boolean;
+}
+
+const messageSchema = new mongoose.Schema<IMessage>(
   {
     conversation: { type: mongoose.Schema.Types.ObjectId, ref: 'Conversation', required: true },
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -14,4 +22,5 @@ const messageSchema = new mongoose.Schema(
 messageSchema.index({ conversation: 1 });
 messageSchema.index({ sender: 1 });
 
-module.exports = mongoose.model('Message', messageSchema);
+const Message: Model<IMessage> = mongoose.model<IMessage>('Message', messageSchema);
+export default Message;
