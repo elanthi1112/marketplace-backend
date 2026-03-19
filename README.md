@@ -91,6 +91,11 @@ The server starts on `http://localhost:3000` by default.
 | `MONGODB_URI`    | MongoDB connection string        | `mongodb://localhost:27017/marketplace` |
 | `JWT_SECRET`     | Secret key for JWT signing       | `your_strong_secret_here`            |
 | `JWT_EXPIRES_IN` | JWT expiry duration              | `7d`                                 |
+| `SMTP_HOST`      | SMTP server host (for email)     | `smtp.gmail.com`                     |
+| `SMTP_PORT`      | SMTP server port                 | `587`                                |
+| `SMTP_USER`      | SMTP username                    | `your@email.com`                     |
+| `SMTP_PASS`      | SMTP password                    | `your_email_password`                |
+| `SMTP_FROM`      | (Optional) From email address    | `noreply@yourdomain.com`             |
 
 ---
 

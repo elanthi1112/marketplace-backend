@@ -1,8 +1,24 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { register, login } from '../controllers/auth.controller';
+import { register, login, verifyCode, refresh } from '../controllers/auth.controller';
 
 const router = Router();
+router.post('/refresh', refresh);
+
+
+router.post(
+  '/verifyCode',
+  [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('code').isLength({ min: 6, max: 6 }).withMessage('Code must be 6 digits'),
+    body('name').notEmpty().withMessage('Name is required'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('role').optional().isIn(['user', 'professional']).withMessage('Role must be user or professional'),
+  ],
+  verifyCode
+);
+
+
 
 router.post(
   '/register',

@@ -4,7 +4,11 @@ import { Request, Response, NextFunction } from 'express';
 
 export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    res.json((req as any).user);
+    res.json({
+      success: true,
+      message: 'User profile fetched successfully',
+      data: (req as any).user
+    });
   } catch (err) {
     next(err);
   }
@@ -14,7 +18,11 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction):
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+      res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
       return;
     }
     const { name, email, phone, avatar } = req.body;
@@ -28,7 +36,11 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction):
       new: true,
       runValidators: true,
     });
-    res.json(user);
+    res.json({
+      success: true,
+      message: 'User profile updated successfully',
+      data: user
+    });
   } catch (err) {
     next(err);
   }
@@ -38,7 +50,10 @@ export const switchRole = async (req: Request, res: Response, next: NextFunction
   try {
     const { role } = req.body;
     if (!['user', 'professional'].includes(role)) {
-      res.status(400).json({ message: 'Role must be user or professional' });
+      res.status(400).json({
+        success: false,
+        message: 'Role must be user or professional'
+      });
       return;
     }
     const user = await User.findByIdAndUpdate(
@@ -46,7 +61,11 @@ export const switchRole = async (req: Request, res: Response, next: NextFunction
       { role },
       { new: true, runValidators: true }
     );
-    res.json({ message: `Role switched to ${role}`, user });
+    res.json({
+      success: true,
+      message: `Role switched to ${role}`,
+      data: user
+    });
   } catch (err) {
     next(err);
   }
